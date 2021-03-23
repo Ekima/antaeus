@@ -8,6 +8,10 @@ import io.pleo.antaeus.core.exceptions.NetworkException
 import io.pleo.antaeus.data.AntaeusDal
 import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
+import java.time.LocalDateTime
+import java.util.Date
+import java.util.Timer
+import java.util.TimerTask
 
 class InvoiceResultWrapper (
     val data: Invoice? = null,
@@ -63,5 +67,16 @@ class BillingService(
         }
 
         return dal.fetchInvoices()
+    }
+
+    fun initiateMonthlyUpdate() {
+        val timer = Timer()
+        val date = LocalDateTime.now()
+        timer.schedule(object: TimerTask() {
+            override fun run() {
+                processAll()
+                initiateMonthlyUpdate()
+            }
+        }, Date(date.year, date.monthValue + 1, 1, 0, 0))
     }
 }
