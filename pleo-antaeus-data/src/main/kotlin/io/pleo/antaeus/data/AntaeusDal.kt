@@ -12,10 +12,7 @@ import io.pleo.antaeus.models.Customer
 import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
 import io.pleo.antaeus.models.Money
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class AntaeusDal(private val db: Database) {
@@ -50,6 +47,17 @@ class AntaeusDal(private val db: Database) {
                 } get InvoiceTable.id
         }
 
+        return fetchInvoice(id)
+    }
+
+    fun updateInvoiceStatus(id: Int, status: InvoiceStatus): Invoice? {
+        transaction(db) {
+            // Update the invoice status.
+            InvoiceTable
+                .update({ InvoiceTable.id eq id}) {
+                    it[this.status] = status.toString()
+                }
+        }
         return fetchInvoice(id)
     }
 
