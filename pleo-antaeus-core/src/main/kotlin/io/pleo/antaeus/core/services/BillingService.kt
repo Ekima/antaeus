@@ -9,12 +9,16 @@ import io.pleo.antaeus.data.AntaeusDal
 import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
 
+class InvoiceResultWrapper (
+    val data: Invoice? = null,
+    val errorMessage: String? = null
+)
+
 class BillingService(
     private val paymentProvider: PaymentProvider,
     private val dal: AntaeusDal
 ) {
-
-    private fun processInvoice(invoice: Invoice): Invoice {
+    private fun processPending(invoice: Invoice): Invoice {
         if (invoice.status == InvoiceStatus.PENDING) try {
             val success = paymentProvider.charge(invoice)
             if (success) {
@@ -37,27 +41,27 @@ class BillingService(
         return invoice
     }
 
-    fun processSingle(id: Int): Boolean {
+    fun processSingle(id: Int): InvoiceResultWrapper {
+        // Process a single pending invoice in the database.
+        // Returns either the updated invoice or an error.
         return try {
             val invoice = dal.fetchInvoice(id)
-            processInvoice(invoice!!)
-            true
+            processPending(invoice!!)
+            InvoiceResultWrapper(data = dal.fetchInvoice(id))
         } catch (e: InvoiceNotFoundException) {
-            false
+            InvoiceResultWrapper(errorMessage = "Invoice not found in database.")
         }
     }
 
-    // Processes all pending invoices in the database
-    // Returns a list of the processed invoices, regardless of whether a charge was successful.
     fun processAll(): List<Invoice> {
-        var processedInvoices: MutableList<Invoice> = ArrayList()
+        // Process all pending invoices in the database.
+        // Returns a list of all the invoices in the database.
         val invoices: List<Invoice> = dal.fetchInvoices()
 
         invoices.forEach { invoice ->
-            processedInvoices + processInvoice(invoice)
-            processedInvoices + invoice
+            processPending(invoice)
         }
 
-        return processedInvoices
+        return dal.fetchInvoices()
     }
 }
