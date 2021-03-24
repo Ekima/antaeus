@@ -34,10 +34,6 @@ class BillingService(
             when (e) {
                 is CurrencyMismatchException, is CustomerNotFoundException, is NetworkException -> {
                     // When either of these exceptions occur, we simply add an error status and continue.
-                    // Future implementations can include:
-                    // CurrencyMismatchException: A Currency Calculator that can invalidate the current
-                    // invoice and create a new one with the correct currency
-                    // NetworkException: Retry before moving on
                     dal.updateInvoiceStatus(invoice.id, InvoiceStatus.ERROR)
                 } else -> throw e
             }

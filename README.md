@@ -88,7 +88,9 @@ The code given is structured as follows. Feel free however to modify the structu
 Happy hacking 😁!
 
 ## Solution
-The solution took approximately x hours to set up, implement, test and document.
+The solution took approximately 4 hours to set up, implement, test and document. If I had more time available in my
+calendar, I would have looked at retries and parallel calls to the payment provider, as well as proper unit testing.
+As it is now, there are things to improve in the solution.
 ### Basic functionality
 Upon initialization, a timer is set to process all pending invoices every month on the 1st.
 
@@ -101,8 +103,8 @@ in case the payment goes through, Delinquent, in case the payment is rejected, o
 This is to more easily expand the system to handle different business cases as described in the Future: Reporting
 Framework section.
 
-A simple retry strategy has been implemented for each call to the payment provider. It would be beneficial to
-restructure the code handling calls to the payment provider to do concurrent calls in order to speed up processing,
+A simple retry strategy could be implemented for each call to the payment provider. It would be beneficial to
+restructure the code handling calls to the payment provider to do parallel calls in order to speed up processing,
 especially in case of problems with the payment provider, however, I didn't implement this in the current solution.
 
 ### Future: Reporting Framework
