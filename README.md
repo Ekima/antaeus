@@ -86,3 +86,36 @@ The code given is structured as follows. Feel free however to modify the structu
 * [Sqlite3](https://sqlite.org/index.html) - Database storage engine
 
 Happy hacking 😁!
+
+## Solution
+
+### Basic functionality
+
+
+### Future: Reporting framework
+The solution as it is now only looks at whether the status is pending to determine whether a charge should be made.
+I added two extra status types, delinquent and error, to show what happened when a charge failed, which could be
+used for creating custom reports for a customer support or sales rep to follow up on. It would be beneficial as well
+when building out the framework to add more details to the error status.
+
+A reporting framework could then contain two different paths, depending on the outcome:
+
+* A report with Delinquent payments to be contacted by a representative in order to find out a payment plan with  a
+  system to support that.
+* A report with payments that incurred an Error, which could be manually investigated. Depending on the error,
+  possible business logic could include:
+  * For Network Errors, investigations into the payment provider and possible downtime reasons or other technical
+    errors are initiated by some technical staff. When the problem has been fixed, the unpaid invoices can be
+    re-processed in bulk.
+  * A Customer Not Found error would either indicate that we have an error in our system, such as a user having been
+    deleted without proper clean-up of their invoices. This would require a manual assessment of the reason for the
+    error and proper next steps, possibly in collaboration with Sales and Engineering.
+  * As for Currency Mismatch errors, this can happen when a customer changes their currency, yet has unpaid invoices
+    in the system. The right solution here would be to create a system that would allow for the invalidation of an
+    invoice followed by the creation of a new invoice in the new currency.
+    
+Since we're dealing with finances, it's generally important that we're diligent not to change or delete information
+around invoices.
+
+To support a proper reporting framework, I would also ensure we expose the date of changes on invoices so that these
+can be pulled monthly and used for analytics.
