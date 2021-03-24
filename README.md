@@ -88,11 +88,24 @@ The code given is structured as follows. Feel free however to modify the structu
 Happy hacking 😁!
 
 ## Solution
-
+The solution took approximately x hours to set up, implement, test and document.
 ### Basic functionality
+Upon initialization, a timer is set to process all pending invoices every month on the 1st.
 
+There are two endpoints to process building through, ``/rest/v1/billing/process`` and ``/rest/v1/billing/process/id``,
+one for processing all pending invoices and one to process a single pending invoice. The first endpoint runs the same
+function as the monthly process to allow for manual updates.
 
-### Future: Reporting framework
+Both processes tries to process a pending payment through the payment provider and marks the invoice as either Paid,
+in case the payment goes through, Delinquent, in case the payment is rejected, or Error, in case an error occurred.
+This is to more easily expand the system to handle different business cases as described in the Future: Reporting
+Framework section.
+
+A simple retry strategy has been implemented for each call to the payment provider. It would be beneficial to
+restructure the code handling calls to the payment provider to do concurrent calls in order to speed up processing,
+especially in case of problems with the payment provider, however, I didn't implement this in the current solution.
+
+### Future: Reporting Framework
 The solution as it is now only looks at whether the status is pending to determine whether a charge should be made.
 I added two extra status types, delinquent and error, to show what happened when a charge failed, which could be
 used for creating custom reports for a customer support or sales rep to follow up on. It would be beneficial as well
